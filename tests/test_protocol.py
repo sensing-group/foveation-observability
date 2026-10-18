@@ -37,6 +37,14 @@ def test_sizes_and_types_match_the_firmware():
     assert "sizeof(bfi_header_t) == 36" in MAIN_C
 
 
+def test_chip_codes_match_the_firmware():
+    pairs = re.findall(r"case CHIP_(ESP32\w*):\s*return (0x[0-9A-Fa-f]+);", MAIN_C)
+    assert pairs
+    for chip, code in pairs:
+        name = chip.replace("ESP32", "ESP32-", 1).rstrip("-")
+        assert proto.CHIP_TYPES[int(code, 16)] == name, (chip, code)
+
+
 def test_trigger_layout_and_crc():
     t = proto.build_trigger("02:00:00:00:00:40", seq=7, slot_id=3, slot_ms=15)
     assert len(t) == proto.TRIGGER_SIZE and t[:2] == bytes([0xC5, 0x10])
@@ -48,7 +56,7 @@ def test_trigger_layout_and_crc():
 
 
 def _hello(mac="02:00:00:00:00:40"):
-    body = bytes([0xC5, 0x01]) + proto.mac_bytes(mac) + bytes([192, 0, 2, 7, 0x05, 5, 9, 0]) \
+    body = bytes([0xC5, 0x01]) + proto.mac_bytes(mac) + bytes([192, 0, 2, 7, 0x08, 5, 9, 0]) \
         + b"UNICAST\x00" + struct.pack("<III", 100, 200000, 150000)
     return body + struct.pack("<I", proto.crc32(body))
 
@@ -83,3 +91,12 @@ def test_bfi_parse():
                       123456, -55, 36, 3, 0xD0, 21, 0, len(payload))
     b = proto.parse_bfi(hdr + payload + struct.pack("<I", proto.crc32(hdr + payload)))
     assert b.node == "02:00:00:00:00:40" and b.channel == 36 and b.body == payload
+    assert b.category == 21 and b.action == 0 and b.is_beamforming_report
+    hdr2 = hdr[:32] + bytes([21, 2]) + hdr[34:]          # VHT Operating Mode Notification
+    b2 = proto.parse_bfi(hdr2 + payload + struct.pack("<I", proto.crc32(hdr2 + payload)))
+    assert not b2.is_beamforming_report
+
+
+def test_short_v6_batch_is_dropped_not_raised():
+    body = bytes([0xC5, 0x08, 1, 1])
+    assert proto.parse_csi_batch(body + struct.pack("<I", proto.crc32(body))) == []

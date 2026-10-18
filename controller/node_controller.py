@@ -37,6 +37,8 @@ SLOT_MS = 20                      # one transmitter per slot; the deployed TDMA 
 RX_GUARD_MS = 5                   # receivers stop collecting this long before the next trigger
 DISCOVER_S = 3.0                  # how long to collect HELLOs before the first cycle
 DISCOVER_REPEATS = 3
+REDISCOVER_S = 5.0                # nodes that boot later still find the host and register
+MIN_SLOT_MS = 15                  # the deployed floor; the firmware drops triggers < 5 ms apart
 AUTHORING_BIN_S = 10.0            # the floor is re-picked once per bin, as in the deployment
 SLOT_ID_MODULO = 256              # slot_id is one byte on the wire
 NODE_TIMEOUT_S = 10.0             # a node silent this long leaves the cycle
@@ -58,6 +60,8 @@ class State:
     slot_tx: Dict[int, str] = field(default_factory=dict)         # slot_id -> transmitter mac
     links: Counter = field(default_factory=Counter)               # (tx, rx) -> samples
     bfi: Counter = field(default_factory=Counter)                 # capturing node -> reports
+    other_actions: Counter = field(default_factory=Counter)       # (category, action) -> frames
+    send_errors: int = 0
     triggers: int = 0
 
 
@@ -103,12 +107,22 @@ class HostProtocol(asyncio.DatagramProtocol):
                                            "trigger_seq": s.trigger_seq}) + "\n")
         elif kind == proto.MSG_BFI:
             b = proto.parse_bfi(data)
-            if b:
+            if b and not b.is_beamforming_report:
+                st.other_actions[(b.category, b.action)] += 1
+            elif b:
                 st.bfi[b.node] += 1
                 self.out.write(json.dumps({"ts": now, "kind": "bfi", "node": b.node,
                                            "beamformee": b.beamformee, "beamformer": b.beamformer,
                                            "rssi": b.rssi, "channel": b.channel,
                                            "body_len": len(b.body)}) + "\n")
+
+
+def send(sock: socket.socket, st: State, pkt: bytes, dest) -> None:
+    """A transient network error (the host's Wi-Fi reconnecting) costs one packet, not the run."""
+    try:
+        sock.sendto(pkt, dest)
+    except OSError:
+        st.send_errors += 1
 
 
 def live_nodes(st: State, now: float) -> List[str]:
@@ -124,8 +138,8 @@ def focus_cycle(roster: List[str], aim: List[str], door: List[str], ts: float,
     return sc.seat_cycle(aim, budget, floor, env)
 
 
-async def run(args) -> State:
-    st = State()
+async def run(args, st: Optional[State] = None) -> State:
+    st = st if st is not None else State()
     out = open(args.out, "w") if args.out else open(os.devnull, "w")
     loop = asyncio.get_running_loop()
     transport, _ = await loop.create_datagram_endpoint(
@@ -134,16 +148,20 @@ async def run(args) -> State:
     tx_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     dest = (args.broadcast, args.trigger_port)
     env = sc.Envelope(max_nodes=args.envelope)
-    aim = [lk for lk in (args.aim or "").split(",") if lk]
-    door = [lk for lk in (args.door or "").split(",") if lk]
+    aim = [lk.strip().upper() for lk in (args.aim or "").split(",") if lk.strip()]
+    door = [lk.strip().upper() for lk in (args.door or "").split(",") if lk.strip()]
     try:
         for _ in range(DISCOVER_REPEATS):
-            tx_sock.sendto(proto.build_discover(), dest)
+            send(tx_sock, st, proto.build_discover(), dest)
             await asyncio.sleep(args.discover_s / DISCOVER_REPEATS)
         t_end = time.time() + args.duration
         seq, cycle, cycle_bin = 0, [], None
+        next_discover = time.time() + REDISCOVER_S
         while time.time() < t_end:
             now = time.time()
+            if now >= next_discover:
+                send(tx_sock, st, proto.build_discover(), dest)
+                next_discover = now + REDISCOVER_S
             roster = live_nodes(st, now)
             if len(roster) < 2:
                 await asyncio.sleep(args.slot_ms / 1000.0)
@@ -154,12 +172,15 @@ async def run(args) -> State:
             elif this_bin != cycle_bin or not cycle:
                 cycle = focus_cycle(roster, aim, door, this_bin * AUTHORING_BIN_S, env)
                 cycle_bin = this_bin
+            if not cycle:
+                await asyncio.sleep(args.slot_ms / 1000.0)
+                continue
             for slot, tx in enumerate(cycle):
                 slot_id = slot % SLOT_ID_MODULO
                 st.slot_tx[slot_id] = tx
                 seq += 1
-                tx_sock.sendto(proto.build_trigger(tx, seq, slot_id,
-                                                   args.slot_ms - RX_GUARD_MS), dest)
+                send(tx_sock, st, proto.build_trigger(tx, seq, slot_id,
+                                                      args.slot_ms - RX_GUARD_MS), dest)
                 st.triggers += 1
                 await asyncio.sleep(args.slot_ms / 1000.0)
     finally:
@@ -175,7 +196,9 @@ def summary(st: State) -> dict:
             "links_with_csi": len(st.links),
             "csi_samples": sum(st.links.values()),
             "per_link": {f"{a}->{b}": c for (a, b), c in sorted(st.links.items())},
-            "bfi_reports": dict(st.bfi)}
+            "bfi_reports": dict(st.bfi),
+            "other_action_frames": {f"{c}/{a}": n for (c, a), n in sorted(st.other_actions.items())},
+            "send_errors": st.send_errors}
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -193,7 +216,15 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--broadcast", default=BROADCAST_ADDR)
     ap.add_argument("--out", type=Path)
     args = ap.parse_args(argv)
-    st = asyncio.run(run(args))
+    if args.slot_ms < MIN_SLOT_MS:
+        ap.error(f"--slot-ms must be at least {MIN_SLOT_MS}")
+    if args.envelope < sc.Envelope().node_budget_min:
+        ap.error(f"--envelope must be at least {sc.Envelope().node_budget_min}")
+    st = State()
+    try:
+        asyncio.run(run(args, st))
+    except KeyboardInterrupt:
+        pass
     print(json.dumps(summary(st), indent=2))
     return 0 if st.links else 1
 

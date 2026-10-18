@@ -36,10 +36,14 @@ TRIGGER_SEQ_SIZE = 4               # appended to every sample since firmware v5.
 BFI_HEADER_SIZE = 36
 BFI_HEADER_FMT = "<2B6s6s6sqbBBBBBH"
 DIE_TEMP_UNAVAILABLE = -32768
+CATEGORY_VHT, CATEGORY_HE = 21, 30
+ACTION_COMPRESSED_BEAMFORMING = 0  # VHT Compressed Beamforming / HE Compressed Beamforming and CQI
 
 BURSTS_PER_TRIGGER = 4             # deployed default
 SAMPLES_PER_MEASUREMENT = 5
-CHIP_TYPES = {0x03: "ESP32-C3", 0x05: "ESP32-C5", 0x06: "ESP32-C6"}
+CHIP_TYPES = {0x01: "ESP32", 0x02: "ESP32-S2", 0x03: "ESP32-C3", 0x04: "ESP32-S3",
+              0x05: "ESP32-C2", 0x06: "ESP32-C6", 0x07: "ESP32-H2", 0x08: "ESP32-C5"}
+"""As get_chip_type_for_protocol() in the firmware."""
 
 
 def crc32(data: bytes) -> int:
@@ -65,8 +69,8 @@ def build_trigger(tx_mac: str, seq: int, slot_id: int, slot_ms: int,
     """TRIGGER: magic, type, tx_mac[6], seq u32, burst_count u16, slot_ms u16 (the receivers'
     collection window), samples u8, send_all u8, slot_id u8, reserved[9], crc32.
 
-    reserved[3..5] carry the burst transport (0 = UDP broadcast), the ESP-NOW rate index and the
-    burst destination (0 = broadcast), as the firmware's trigger handler reads them."""
+    reserved[2..4] (bytes 21-23) carry the burst transport (0 = UDP broadcast), the ESP-NOW rate
+    index and the burst destination (0 = broadcast), as the firmware's trigger handler reads them."""
     buf = bytearray(TRIGGER_SIZE)
     buf[0], buf[1] = MAGIC, MSG_TRIGGER
     buf[2:8] = mac_bytes(tx_mac)
@@ -148,6 +152,8 @@ def parse_csi_batch(data: bytes) -> List[CsiSample]:
     if data[1] == MSG_CSI_V5:
         head, base = BATCH_HEADER_V5_SIZE, SAMPLE_V5_SIZE
     else:
+        if len(data) < BATCH_HEADER_V6_SIZE + 4:
+            return []
         n_sc = struct.unpack("<H", data[8:10])[0]
         head, base = BATCH_HEADER_V6_SIZE, 3 + 2 * n_sc
     if count == 0:
@@ -174,7 +180,16 @@ class BfiReport:
     beamformer: str
     rssi: int
     channel: int
-    body: bytes                    # the raw action-frame body (compressed beamforming report)
+    category: int                  # 21 = VHT, 30 = HE
+    action: int
+    body: bytes                    # the raw action-frame body
+
+    @property
+    def is_beamforming_report(self) -> bool:
+        """The firmware forwards every VHT and HE action frame; only action 0 is a compressed
+        beamforming report."""
+        return self.category in (CATEGORY_VHT, CATEGORY_HE) and \
+            self.action == ACTION_COMPRESSED_BEAMFORMING
 
 
 def parse_bfi(data: bytes) -> Optional[BfiReport]:
@@ -182,5 +197,5 @@ def parse_bfi(data: bytes) -> Optional[BfiReport]:
             or not crc_ok(data):
         return None
     f = struct.unpack(BFI_HEADER_FMT, data[:BFI_HEADER_SIZE])
-    return BfiReport(mac_str(f[2]), mac_str(f[3]), mac_str(f[4]), f[6], f[7],
+    return BfiReport(mac_str(f[2]), mac_str(f[3]), mac_str(f[4]), f[6], f[7], f[10], f[11],
                      data[BFI_HEADER_SIZE:BFI_HEADER_SIZE + f[-1]])

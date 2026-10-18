@@ -15,7 +15,7 @@ the article).
 
 | Folder | What it is |
 |---|---|
-| `firmware/` | The node firmware the mesh ran (v5.9.0, ESP32-C5 and ESP32-C3, ESP-IDF 5.4.1): triggered CSI sounding and overheard beamforming reports. |
+| `firmware/` | The node firmware (v5.9.1, ESP32-C5 and ESP32-C3, ESP-IDF 5.4.1): triggered CSI sounding and overheard beamforming reports. |
 | `controller/` | The host side of the two-tier design: the firmware's wire protocol, a node controller that runs the sounding cycle, the seat allocator of the focused tier (Sec. IV) and the absence release of the case study (Sec. V). |
 | `scripts/` | The analysis behind every figure and quoted number (Secs. III to V). |
 | `data/`, `reference/` | Inputs, and the outputs the article was written from. |

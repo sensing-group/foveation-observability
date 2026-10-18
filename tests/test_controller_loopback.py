@@ -26,7 +26,7 @@ def free_port() -> int:
 
 def hello(mac: str, ip: str) -> bytes:
     body = bytes([0xC5, 0x01]) + proto.mac_bytes(mac) + bytes(int(x) for x in ip.split(".")) \
-        + bytes([0x05, 5, 9, 0]) + b"SIM\x00\x00\x00\x00\x00" + struct.pack("<III", 1, 2, 3)
+        + bytes([0x08, 5, 9, 0]) + b"SIM\x00\x00\x00\x00\x00" + struct.pack("<III", 1, 2, 3)
     return body + struct.pack("<I", proto.crc32(body))
 
 
