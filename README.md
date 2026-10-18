@@ -28,30 +28,6 @@ the article).
 <p align="center"><em>An ESP32-C5 node: a Seeed Studio XIAO ESP32-C5 in a printed enclosure, open (left)
 and closed with its external 2.4/5 GHz antenna (right).</em></p>
 
-## Reproduce the article
-
-```
-pip install -r requirements.txt
-./reproduce.sh
-```
-
-`reproduce.sh` writes figures, logs and JSON files to `results/`, replays the release of the case
-study from its logged inputs, and compares every number against `reference/`. It runs in about a
-minute.
-
-| Article | Script | Output |
-|---|---|---|
-| Fig. 3, the feasibility test against the budget (Sec. III-C) | `scripts/make_fig_feasibility.py` | `fig_feasibility.pdf`, `feasibility.json` |
-| Fig. 4, the observability field and the detectability contour (Secs. III-B, V) | `scripts/make_fig_field.py` | `fig_field.pdf`, `field.json` |
-| Fig. 5, the evening of 4 August 2026 (Sec. V) | `scripts/make_fig_episode.py` | `fig_episode.pdf`, `episode_stats.json` |
-| Required set and best split at the room centre; floor shares; directed links; position perturbation; field under the centre-aimed allocation; halved SNR; exchange airtime (Secs. III, IV) | `scripts/robustness.py` | `robustness.json` |
-| The 21:50 release, recomputed bin by bin from the evening's evidence (Sec. V) | `controller/replay_episode.py` | `episode_replay.json` |
-| Required set and allocation program over the room, two sensitivity metrics | `scripts/required_set_lp.py` | `required_set_lp.log` |
-| Threshold and floor sweeps, detectability against localizability | `scripts/allocation_floor_sweep.py` | `allocation_floor_sweep.log` |
-
-`scripts/model.py` holds the forward model and the Cramer-Rao bound; its docstring states the
-assumptions.
-
 ## Run a mesh
 
 <p align="center"><img src="docs/fig_system.png" alt="Layers of a foveated sensing system: mesh, measurement tiers, backend, budget allocation, and the return path" width="60%"></p>
@@ -93,7 +69,7 @@ release replay matches the logged absence score in every bin of the hold.
   `s_absence` and `absence_reason`.
 
 Two inputs come from the deployment and are not regenerated here: the signal and noise levels in
-`model.py` (0.072 and 0.039, measured over a 144-minute confirmed-empty run and an occupied run),
+`scripts/model.py` (0.072 and 0.039, measured over a 144-minute confirmed-empty run and an occupied run),
 and the adaptive-focus airtime shares of Sec. III-B (0.25 and 0.41, from the 19 July 2026 logs).
 
 ## License
