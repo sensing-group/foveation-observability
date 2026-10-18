@@ -1,4 +1,4 @@
-# Foveation and observability: code, firmware and data
+# Foveation and Observability in Wireless Sensor Networks
 
 Code, node firmware and data behind K. Khamaisi and B. Rodrigues, "Foveation and Observability
 in Next-Generation Wireless Sensing Networks", IEEE Communications Magazine (under revision).
