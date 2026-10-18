@@ -1,0 +1,37 @@
+# ESP32-C5 specific overrides
+#
+# Loaded by ESP-IDF AFTER sdkconfig.defaults when the target is esp32c5
+# (idf.py set-target esp32c5). Only C5-specific values here; shared values
+# stay in sdkconfig.defaults.
+#
+# =============================================================================
+# BAND SELECTION: 2.4 GHz HE20 (WiFi 6) -- the working, exploitable path.
+# =============================================================================
+# The C5's headline feature is 5 GHz, BUT 5 GHz CSI is currently broken in
+# ESP-IDF: the CSI IQ buffer returns frozen/static data on 5 GHz channels
+# (esp-idf issue #18493, reproduced on v5.5.4 ch36). RSSI/seq/timestamp
+# update correctly, so it LOOKS alive while emitting garbage tomography data.
+# 2.4 GHz CSI works correctly.
+#
+# The real win over the C3 fleet is therefore HE20 on 2.4 GHz: 242 usable
+# subcarriers vs 52 (~4.6x frequency resolution). HE40 does not exist on the
+# C5 -- 802.11ax is 20 MHz-only; 40 MHz is HT40/802.11n (114 tones) only.
+#
+# We inherit CONFIG_WIFI_CHANNEL from sdkconfig.defaults (11, 2.4 GHz), which
+# also keeps it within the Kconfig `range 0 13`. Do NOT set a 5 GHz channel
+# here until #18493 is fixed AND bench-verified (buf must vary frame-to-frame).
+#
+# 5 GHz re-enable checklist (future, once Espressif fixes the PHY blob):
+#   1. Widen WIFI_CHANNEL Kconfig range to allow 36-165.
+#   2. Set CONFIG_WIFI_CHANNEL=36 (UNII-1, no DFS) here.
+#   3. Set country code to a domain permitting UNII-1 (already "AT" in main.c).
+#   4. Confirm received CSI: bb_format==HE-SU and len~=490, buf changing.
+
+# CPU at full 240 MHz -- C5 supports it, and the CSI hot-path benefits.
+# (C3 default is 160 MHz; C5 can clock higher.)
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ=240
+
+# WiFi 6 (802.11ax) is gated by CONFIG_SOC_WIFI_HE_SUPPORT, which the
+# C5 SoC component sets automatically. CONFIG_ESP_WIFI_11AX_SUPPORT=y
+# is inherited from sdkconfig.defaults.
