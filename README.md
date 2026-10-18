@@ -11,6 +11,13 @@ in Next-Generation Wireless Sensing Networks", IEEE Communications Magazine (und
 | `data/`, `reference/` | Inputs, and the outputs the article was written from. |
 | `tests/` | Tests for all of the above. |
 
+<p align="center">
+  <img src="docs/c5-open.jpg" alt="Seeed Studio XIAO ESP32-C5 in its open enclosure, antenna cable to an SMA connector" width="48%">
+  <img src="docs/c5-closed.jpg" alt="The closed enclosure with its external antenna" width="48%">
+</p>
+<p align="center"><em>An ESP32-C5 node: a Seeed Studio XIAO ESP32-C5 in a printed enclosure, open (left)
+and closed with its external 2.4/5 GHz antenna (right).</em></p>
+
 ## Reproduce the article
 
 ```
