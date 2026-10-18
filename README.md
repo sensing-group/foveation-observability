@@ -3,6 +3,16 @@
 Code, node firmware and data behind K. Khamaisi and B. Rodrigues, "Foveation and Observability
 in Next-Generation Wireless Sensing Networks", IEEE Communications Magazine (under revision).
 
+<p align="center"><img src="docs/fig_paradigms.png" alt="Three sensing paradigms on the same room: uniform sounding, attention-aware, observability-aware" width="100%"></p>
+
+A mesh of Wi-Fi nodes shares one sounding budget. Uniform sounding spreads it over every link,
+so on a dense mesh no link is sampled fast enough to resolve human motion. Concentrating the
+budget on the links around the occupant (foveation) recovers the rate, but the rest of the room
+stops being sensed and a silence there is indistinguishable from an empty room. The approach
+keeps a floor of sounding on the periphery, and computes from the node geometry where the mesh
+can and cannot localize, so the system reports the regions it could not have observed (Fig. 2 of
+the article).
+
 | Folder | What it is |
 |---|---|
 | `firmware/` | The node firmware the mesh ran (v5.9.0, ESP32-C5 and ESP32-C3, ESP-IDF 5.4.1): triggered CSI sounding and overheard beamforming reports. |
@@ -43,6 +53,11 @@ minute.
 assumptions.
 
 ## Run a mesh
+
+<p align="center"><img src="docs/fig_system.png" alt="Layers of a foveated sensing system: mesh, measurement tiers, backend, budget allocation, and the return path" width="60%"></p>
+<p align="center"><em>The layers the code implements (Fig. 1 of the article): the firmware is the mesh
+and the measurement tiers, the controller is the allocation and the return path that tells the
+radios which nodes transmit and how often.</em></p>
 
 1. Build and flash `firmware/` on two or more ESP32-C5 or ESP32-C3 boards (`firmware/README.md`).
 2. On a host on the same network:
