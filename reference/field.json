@@ -1,0 +1,16 @@
+{
+  "median_bound_cm": 30.67936519158335,
+  "p90_bound_cm": 845.6100738784818,
+  "not_localizable_frac": 0.18555714968914394,
+  "not_detectable_frac": 0.31420373027259685,
+  "detectable_not_localizable_frac": 0.0,
+  "neither_frac": 0.18555714968914394,
+  "one_second": {
+    "not_localizable_frac": 0.10760401721664276,
+    "not_detectable_frac": 0.13103778096604496,
+    "detectable_not_localizable_frac": 0.006217120994739359
+  },
+  "deflection_threshold": 3.0,
+  "blind_threshold_m": 1.0,
+  "snr": 1.846153846153846
+}

@@ -1,0 +1,54 @@
+{
+  "rate_walk_hz": 46.0,
+  "req_fraction": 0.8,
+  "b_deployed": 50.0,
+  "exchange_us": 352.9,
+  "n_nodes": 10,
+  "uniform_rate_deployed_hz": 10.0,
+  "b_uniform_pass": 230.0,
+  "airtime_pct": {
+    "50.0": 1.76,
+    "92": 3.25,
+    "184": 6.49,
+    "200": 7.06,
+    "230": 8.12
+  },
+  "pass_fraction_at": {
+    "no floor": {
+      "50.0": 0.225,
+      "92": 0.56,
+      "184": 0.936,
+      "200": 0.936,
+      "230": 1.0
+    },
+    "half share kept": {
+      "50.0": 0.0,
+      "92": 0.225,
+      "184": 0.863,
+      "200": 0.863,
+      "230": 1.0
+    },
+    "uniform": {
+      "50.0": 0.0,
+      "92": 0.0,
+      "184": 0.0,
+      "200": 0.0,
+      "230": 1.0
+    }
+  },
+  "budget_for_half_room": {
+    "no floor": 92.0,
+    "half share kept": 132.0,
+    "uniform": 230.0
+  },
+  "budget_for_90pct_room": {
+    "no floor": 184.0,
+    "half share kept": 205.0,
+    "uniform": 230.0
+  },
+  "median_rate_at_200": {
+    "no floor": 100.0,
+    "half share kept": 70.0,
+    "uniform": 40.0
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "start_local": "19:00",
+  "entry_local": "19:34",
+  "release_local": "21:50",
+  "hold_hours": 2.272222222222222,
+  "empty_p90": 1.7836599999999998,
+  "held_bins_below_empty_p90": 0.8531976744186046
+}

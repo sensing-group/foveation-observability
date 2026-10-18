@@ -1,0 +1,52 @@
+{
+  "not_localizable_frac": 0.18555714968914394,
+  "not_localizable_frac_snr_halved": 0.2898134863701578,
+  "positions_perturbed": {
+    "sigma_m": 0.5,
+    "p10": 0.12094691535150646,
+    "median": 0.2269249163079866,
+    "p90": 0.32089909134385464
+  },
+  "room_centre": {
+    "required_links": 12,
+    "rate_hz": 50.0,
+    "uniform_rate_hz": 40.0,
+    "funded_nodes": 4,
+    "dark_links": 15
+  },
+  "field_under_centre_allocation_not_localizable": {
+    "0.00": 0.1908177905308465,
+    "0.33": 0.1841224294595887,
+    "0.50": 0.1831659493065519,
+    "1.00": 0.18555714968914394
+  },
+  "floor_shares_at_200": {
+    "0.00": {
+      "pass_frac": 0.9361590790162219,
+      "median_dark_links": 28.0
+    },
+    "0.33": {
+      "pass_frac": 0.9361590790162219,
+      "median_dark_links": 0.0
+    },
+    "0.50": {
+      "pass_frac": 0.8634222919937206,
+      "median_dark_links": 0.0
+    }
+  },
+  "directed": {
+    "uniform_rate_hz": 20.0,
+    "pass_frac": 0.9361590790162219
+  },
+  "exchange_us": {
+    "parts": {
+      "channel access": 110.5,
+      "NDPA": 76.0,
+      "NDP": 49.6,
+      "2 x SIFS": 32.0,
+      "compressed report": 84.8
+    },
+    "total": 352.9,
+    "without_report": 268.1
+  }
+}

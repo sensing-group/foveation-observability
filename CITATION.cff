@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the article."
+title: "Foveation and observability: code and data"
+authors:
+  - family-names: Khamaisi
+    given-names: Karim
+  - family-names: Rodrigues
+    given-names: Bruno
+license: MIT
+repository-code: "https://github.com/sensing-group/foveation-observability"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Khamaisi
+      given-names: Karim
+    - family-names: Rodrigues
+      given-names: Bruno
+  title: "Foveation and Observability in Next-Generation Wireless Sensing Networks"
+  journal: "IEEE Communications Magazine"
+  status: submitted
