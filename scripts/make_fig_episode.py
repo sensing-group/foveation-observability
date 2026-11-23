@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""FIGURE 5: one evening. The presence estimate against the movement evidence it had.
+"""FIGURE 5: the recorded occupancy period. The presence estimate against the movement evidence it had.
 
 Episode of 2026-08-04 (local time, UTC+2): entry 19:34, hold through a quiet movement
 channel, release 21:50 by accumulated absence. Reads data/episode.json (per-bin rows:
@@ -50,7 +50,7 @@ def main() -> int:
     fig = plt.figure(figsize=(3.5, 2.1))
     fig.patch.set_facecolor("white")
     card = fs.card_grid(fig, 1)
-    ax = card(0, "Presence estimate over one evening", padl=0.062, padr=0.085, padb=0.20, padt=0.19)
+    ax = card(0, "Occupancy estimate during the recording", padl=0.062, padr=0.085, padb=0.20, padt=0.19)
     ax.fill_between(hrs, 0, present, step="mid", color=fs.BLUE, alpha=0.12, linewidth=0)
     ax.plot(hrs, present, drawstyle="steps-mid", color=fs.BLUE, lw=1.4)
     ax.set_ylim(-0.04, 1.42)
@@ -63,7 +63,7 @@ def main() -> int:
     axm = ax.twinx()
     axm.fill_between(hrs, 0, zsm, color=fs.ORANGE, alpha=0.42, linewidth=0)
     axm.plot(hrs, zsm, color=fs.ORANGE, lw=0.8)
-    axm.set_ylabel("movement evidence", fontsize=7.2, color=fs.ORANGE, labelpad=1)
+    axm.set_ylabel("CSI motion statistic", fontsize=7.2, color=fs.ORANGE, labelpad=1)
     axm.tick_params(labelsize=6.6, colors=fs.ORANGE)
     axm.axhline(empty_p90, color=fs.GREY, lw=0.8, ls=(0, (4, 2)), zorder=4)
     axm.text(hrs.max() - 0.06, empty_p90 + 0.25, "empty-room p90", fontsize=6.8, color=fs.GREY,

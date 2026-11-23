@@ -59,7 +59,7 @@ release replay matches the logged absence score in every bin of the hold.
 ## Data
 
 - `data/positions.json`: the ten node positions in metres, from the mesh's own position solver
-  (not a survey), keyed by the last two bytes of each node's MAC address, as printed in Fig. 4.
+  (not a survey), keyed by the last two bytes of each node's MAC address, as printed in Fig. 3.
 - `data/episode.json`: the evening of 4 August 2026, 19:00 to 23:00 local time (UTC+2), one row
   per 10 s bin, as plotted in Fig. 5: `p_present` the presence belief, `reported_occupied` the
   reported state, `z_roll` the movement statistic, `s_absence` the absence score.
@@ -69,8 +69,10 @@ release replay matches the logged absence score in every bin of the hold.
   `s_absence` and `absence_reason`.
 
 Two inputs come from the deployment and are not regenerated here: the signal and noise levels in
-`scripts/model.py` (0.072 and 0.039, measured over a 144-minute confirmed-empty run and an occupied run),
-and the adaptive-focus airtime shares of Sec. III-B (0.25 and 0.41, from the 19 July 2026 logs).
+`scripts/model.py` (0.072 and 0.039, measured over a 144-minute confirmed-empty run and an occupied run).
+
+`docs/technical_note.md` gives the models, parameters and derivations behind every figure and
+number of the article, and the script that produces each one.
 
 ## License
 

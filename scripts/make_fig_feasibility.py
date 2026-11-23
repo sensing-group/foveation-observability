@@ -138,7 +138,7 @@ def main() -> int:
     fig = plt.figure(figsize=(3.5, 2.7))
     fig.patch.set_facecolor("white")
     card = fs.card_grid(fig, 1)
-    ax = card(0, "Walking-speed tracking against the budget",
+    ax = card(0, "Room share that supports walking",
               padl=0.052, padr=0.012, padb=0.21, padt=0.27)
     styles = {"no floor": (fs.BLUE, "-"), "half share kept": (fs.ORANGE, "-"),
               "uniform": (fs.GREY, "--")}
