@@ -59,7 +59,7 @@ release replay matches the logged absence score in every bin of the hold.
 
 ## Data
 
-- `data/positions.json`: the ten node positions in metres, from the mesh's own position solver
+- `data/positions.json`: the ten node positions in meters, from the mesh's own position solver
   (not a survey), keyed by the last two bytes of each node's MAC address, the circles in Fig. 3.
 - `data/episode.json`: 4 August 2026, 19:00 to 23:00 local time (UTC+2), one row
   per 10 s bin, as plotted in Fig. 5: `p_present` the occupancy estimate, `reported_occupied` the

@@ -63,7 +63,7 @@ $$J(x) = \mathrm{SNR}^2 \sum_{(i,j)} \nabla w_{ij}(x)\, \nabla w_{ij}(x)^{\maths
 \left(\frac{x-n_i}{\lVert x-n_i\rVert} + \frac{x-n_j}{\lVert x-n_j\rVert}\right).$$
 
 The Cramér–Rao bound states that no unbiased estimator can have a lower RMS position error
-than $\sqrt{\operatorname{tr} J(x)^{-1}}$. It is evaluated on a 10 cm grid. A point is **not localizable** when this bound exceeds 1 m. With $K$ samples
+than $\sqrt{\mathrm{tr}\left(J(x)^{-1}\right)}$. It is evaluated on a 10 cm grid. A point is **not localizable** when this bound exceeds 1 m. With $K$ samples
 per link the information scales by $K$ and the bound by $1/\sqrt{K}$, which is why the geometry
 fixes the shape of the field and the sounding budget its scale.
 
@@ -114,7 +114,7 @@ $2f_D \approx 46$ Hz per link. Limbs move faster than the torso, so this is a lo
 following a position (a walker crosses a 0.7 m Fresnel zone in about 0.5 s), needs far less.
 
 **Required links.** At location $x$, sort the links by $w_{ij}(x)$ and take the shortest prefix
-that carries 80% of $\sum w_{ij}(x)$. At the room centre this gives 12 links, which together
+that carries 80% of $\sum w_{ij}(x)$. At the room center this gives 12 links, which together
 touch all ten nodes.
 
 **Best split.** The highest rate the slowest required link can reach is the linear program
@@ -132,7 +132,7 @@ sounding is a set of fewer than $T/2$ nodes that covers all required links, sinc
 weights form a cover of weight below $T/2$. The converse does not hold, because $\tau^*$ can be
 fractional (half-integral). In the test room, $\tau^*$ takes the values 1, 2, 3, 4, 4.5 and 5,
 and uniform sounding is optimal ($\tau^* = 5$) at 120 of 1,911 grid points (6%). At the room
-centre $\tau^* = 4$: four nodes cover all
+center $\tau^* = 4$: four nodes cover all
 12 required links, so $r^* = 200/4 = 50$ Hz against 40 Hz uniform. The other six nodes stop
 transmitting, and the $\binom{6}{2} = 15$ links among them are no longer sampled.
 
@@ -142,13 +142,13 @@ room against $B$.
 | Budget $B$ (exchanges/s) | Uniform ($\beta = 1$) | Foveation, no floor ($\beta = 0$) | Floor $\beta = 1/2$ | Airtime at 352.9 µs per exchange |
 |---|---|---|---|---|
 | 50 (deployed) | 0% | 22.5% | 0% | 1.8% |
-| 92 | 0% | 56.0% | 22.5% | 3.3% |
+| 92 | 0% | 56.0% | 22.5% | 3.2% |
 | 184 | 0% | 93.6% | 86.3% | 6.5% |
 | 200 | 0% | 93.6% | 86.3% | 7.1% |
 | 230 | 100% | 100% | 100% | 8.1% |
 
 With $\beta = 1/3$, the supported share at $B = 200$ stays at 93.6% and no link is left
-unsampled (median unsampled links: 0, against 28 without a floor). Under the centre-aimed
+unsampled (median unsampled links: 0, against 28 without a floor). Under the center-aimed
 allocation the not-localizable share of the field stays at 18% to 19% for every floor, so the
 price of the fovea is the periphery's sampling rate, not its observability.
 
@@ -165,7 +165,7 @@ not implement 802.11bf, and their legacy bursts cost several times more per trig
 1.8% at 50 exchanges per second does not describe the deployed mesh.
 
 Scripts: `scripts/make_fig_feasibility.py` (Fig. 4, `results/feasibility.json`),
-`scripts/required_set_lp.py` (room centre, `results/required_set_lp.log`),
+`scripts/required_set_lp.py` (room center, `results/required_set_lp.log`),
 `scripts/allocation_floor_sweep.py` (floors and threshold robustness), `scripts/robustness.py`.
 
 ## 5. Airtime of one 802.11bf exchange (Sec. IV-A)
@@ -183,7 +183,7 @@ Computed from 802.11 frame durations, not measured:
 | Without the report (CSI processed on the node) | 268.1 |
 
 230 exchanges per second therefore take 230 × 352.9 µs = 81 ms of every second (8.1%), and 92
-exchanges take 32 ms (3.3%). Source: `EXCHANGE_PARTS_US` in `scripts/robustness.py`.
+exchanges take 32 ms (3.2%). Source: `EXCHANGE_PARTS_US` in `scripts/robustness.py`.
 
 ## 6. Occupancy release rule (Sec. V)
 
@@ -204,7 +204,7 @@ Per 10 s bin:
 | All sources quiet within 5 minutes after a negative probe | +0.05 nats |
 | All sources quiet, no traffic drop, no probe | none |
 
-The release level of 6 nats corresponds to nominal odds of $e^6 \approx 400$ to 1 in favour of
+The release level of 6 nats corresponds to nominal odds of $e^6 \approx 400$ to 1 in favor of
 absence. With 0.05 nats per bin it takes at least 120 quiet bins (20 minutes), and with
 continuous probing 40 bins (about 7 minutes). The per-bin credits are design parameters of the
 deployed system, not quantities estimated from data. A moderate penalty cancels the credit of
